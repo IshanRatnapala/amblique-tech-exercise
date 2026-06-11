@@ -35,6 +35,7 @@ import { cn } from '@/lib/utils';
 import type { DynamicImageDimensions } from '@/lib/images/dynamic-image';
 import type { AppConfig } from '@/types/config';
 import { UITarget } from '@/targets/ui-target';
+import { useImageHoverZoom } from '@/hooks/use-image-hover-zoom';
 
 export interface GalleryImage {
     src: string;
@@ -62,6 +63,8 @@ interface ImageGalleryWidths {
 interface ImageGalleryProps {
     images: GalleryImage[];
     eager?: boolean;
+    /** Enable desktop hover zoom mode for the main image */
+    enableHoverZoom?: boolean;
     /** Show prev/next arrows on the main image (e.g. in modal) */
     showNavigationArrows?: boolean;
     /** Size of navigation arrows: "sm" (default) or "lg" for PDP */
@@ -137,6 +140,7 @@ const isPreloadAllowedByConnection = (): boolean => {
 export default function ImageGallery({
     images,
     eager = false,
+    enableHoverZoom = false,
     showNavigationArrows = false,
     navigationArrowSize = 'sm',
     horizontalThumbnails = false,
@@ -191,6 +195,10 @@ export default function ImageGallery({
         }
     }, []);
 
+    const { isZoomActive, imageStyle, onPointerEnter, onPointerMove, onPointerLeave } = useImageHoverZoom({
+        enabled: enableHoverZoom,
+    });
+
     useEffect(() => {
         // When images change (e.g., color variant changes), try to preserve the selected index
         // Only reset to 0 if the current index is out of bounds for the new images array
@@ -241,12 +249,21 @@ export default function ImageGallery({
         <UITarget targetId="sfcc.pdp.products.gallery">
             <div className="space-y-4">
                 {/* Main Image */}
-                <div className="relative aspect-square overflow-hidden rounded-none bg-muted">
+                <div
+                    className="relative aspect-square overflow-hidden rounded-none bg-muted"
+                    onPointerEnter={onPointerEnter}
+                    onPointerMove={onPointerMove}
+                    onPointerLeave={onPointerLeave}>
                     <DynamicImage
                         src={selectedImage.src}
                         alt={selectedImage.alt || imageAltFallback}
                         widths={mainWidths}
                         className="w-full h-full object-cover object-center [&_img]:object-contain! [&_img]:h-full! [&_img]:max-w-full! [&_img]:mx-auto!"
+                        imageProps={{
+                            className:
+                                'object-contain h-full max-w-full mx-auto transition-transform duration-200 ease-out',
+                            ...(isZoomActive && { style: imageStyle }),
+                        }}
                         loading={eager ? 'eager' : 'lazy'}
                         priority={eager ? 'high' : undefined}
                     />
