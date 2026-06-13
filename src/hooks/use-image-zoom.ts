@@ -13,11 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useState, useCallback, useRef, type CSSProperties, type PointerEvent } from 'react';
+import { useState, useCallback, useRef, type CSSProperties, type PointerEvent, type KeyboardEvent } from 'react';
 import { useIsDesktop } from '@/hooks/use-breakpoint';
 
 const DEFAULT_ZOOM: CSSProperties = {
     transform: 'translate3d(0%,0%,0) scale(1)',
+    transformOrigin: '50% 50%',
+};
+
+const KEYBOARD_ZOOM: CSSProperties = {
+    transform: 'translate3d(0,0,0) scale(1.5)',
     transformOrigin: '50% 50%',
 };
 
@@ -35,15 +40,18 @@ export interface UseImageZoomResult {
     onPointerUp: (event: PointerEvent<HTMLDivElement>) => void;
     onPointerCancel: (event: PointerEvent<HTMLDivElement>) => void;
     onPointerLeave: () => void;
+    onKeyDown: (event: KeyboardEvent<HTMLDivElement>) => void;
+    resetZoom: () => void;
 }
 
 export function useImageZoom({ hoverZoom = false, pinchZoom = false }: UseImageZoomOptions = {}): UseImageZoomResult {
     const isDesktop = useIsDesktop();
     const [imageStyle, setImageStyle] = useState<CSSProperties>(DEFAULT_ZOOM);
     const [isPinchZoomActive, setIsPinchZoomActive] = useState(false);
+    const [isKeyboardZoomActive, setIsKeyboardZoomActive] = useState(false);
     const hoverZoomEnabled = hoverZoom && isDesktop;
     const pinchZoomEnabled = pinchZoom;
-    const isZoomActive = hoverZoomEnabled || isPinchZoomActive;
+    const isZoomActive = hoverZoomEnabled || isPinchZoomActive || isKeyboardZoomActive;
     const activePointersRef = useRef<Map<number, { x: number; y: number }>>(new Map());
     const pinchStartDistanceRef = useRef<number | null>(null);
 
@@ -101,7 +109,7 @@ export function useImageZoom({ hoverZoom = false, pinchZoom = false }: UseImageZ
                     : DEFAULT_ZOOM
             );
         },
-        []
+        [pinchZoomEnabled, getTouchDistance, getTouchMidpoint, setIsPinchZoomActive, setImageStyle]
     );
 
     const updateHoverZoom = useCallback(
@@ -134,7 +142,7 @@ export function useImageZoom({ hoverZoom = false, pinchZoom = false }: UseImageZ
         (event: PointerEvent<HTMLDivElement>) => {
             updateHoverZoom(event);
         },
-        [hoverZoomEnabled, updateHoverZoom]
+        [updateHoverZoom]
     );
 
     const onPointerMove = useCallback(
@@ -150,7 +158,7 @@ export function useImageZoom({ hoverZoom = false, pinchZoom = false }: UseImageZ
 
             updateHoverZoom(event);
         },
-        [pinchZoomEnabled, getTouchDistance, updatePinchZoom, updateHoverZoom]
+        [pinchZoomEnabled, updatePinchZoom, updateHoverZoom]
     );
 
     const onPointerDown = useCallback(
@@ -206,15 +214,35 @@ export function useImageZoom({ hoverZoom = false, pinchZoom = false }: UseImageZ
         }
     }, [hoverZoomEnabled]);
 
+    const onKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            setIsKeyboardZoomActive((currentValue) => !currentValue);
+            return;
+        }
+
+        if (event.key === 'Escape') {
+            setIsKeyboardZoomActive(false);
+        }
+    }, []);
+
+    const resetZoom = useCallback(() => {
+        setIsPinchZoomActive(false);
+        setIsKeyboardZoomActive(false);
+        setImageStyle(DEFAULT_ZOOM);
+    }, []);
+
     return {
         isZoomActive,
-        imageStyle,
+        imageStyle: isKeyboardZoomActive ? KEYBOARD_ZOOM : imageStyle,
         onPointerDown,
         onPointerEnter,
         onPointerMove,
         onPointerUp,
         onPointerCancel,
         onPointerLeave,
+        onKeyDown,
+        resetZoom,
     };
 }
 

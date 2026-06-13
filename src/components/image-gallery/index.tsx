@@ -207,6 +207,8 @@ export default function ImageGallery({
         onPointerUp,
         onPointerCancel,
         onPointerLeave,
+        onKeyDown,
+        resetZoom,
     } = useImageZoom({
         hoverZoom: enableHoverZoom,
         pinchZoom: enablePinchZoom,
@@ -222,6 +224,11 @@ export default function ImageGallery({
             return currentIndex < images.length ? currentIndex : 0;
         });
     }, [images]);
+
+    useEffect(() => {
+        // Image change should reset zoom.
+        resetZoom();
+    }, [resetZoom, selectedImageIndex]);
 
     // Off-screen slides eligible for eager preload. Save-Data and the cap are folded into the array length so the
     // sequencer's `n === 0` disabled state doubles as the "nothing to do" guard. No idle frames are scheduled when
@@ -263,13 +270,16 @@ export default function ImageGallery({
             <div className="space-y-4">
                 {/* Main Image */}
                 <div
-                    className="relative aspect-square overflow-hidden rounded-none bg-muted touch-none lg:touch-auto"
+                    className="relative aspect-square overflow-hidden rounded-none bg-muted touch-none lg:touch-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    tabIndex={0}
                     onPointerDown={onPointerDown}
                     onPointerEnter={onPointerEnter}
                     onPointerMove={onPointerMove}
                     onPointerUp={onPointerUp}
                     onPointerCancel={onPointerCancel}
-                    onPointerLeave={onPointerLeave}>
+                    onPointerLeave={onPointerLeave}
+                    onKeyDown={onKeyDown}
+                    onBlur={resetZoom}>
                     <DynamicImage
                         src={selectedImage.src}
                         alt={selectedImage.alt || imageAltFallback}
