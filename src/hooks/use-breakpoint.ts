@@ -37,7 +37,7 @@ function createMediaQueryHook(query: string): () => boolean {
 }
 
 export const useIsDesktop = createMediaQueryHook(
-    `(min-width: ${defaultTheme.screens.lg}) and (hover: hover) and (pointer: fine)`
+    `(min-width: ${defaultTheme.screens.lg})`
 );
 
 export const useIsMobile = createMediaQueryHook(`(max-width: calc(${defaultTheme.screens.lg} - 1px))`);
