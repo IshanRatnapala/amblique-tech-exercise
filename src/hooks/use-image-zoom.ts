@@ -21,12 +21,12 @@ const DEFAULT_ZOOM: CSSProperties = {
     transformOrigin: '50% 50%',
 };
 
-export interface UseImageHoverZoomOptions {
+export interface UseImageZoomOptions {
     hoverZoom?: boolean;
     pinchZoom?: boolean;
 }
 
-export interface UseImageHoverZoomResult {
+export interface UseImageZoomResult {
     isZoomActive: boolean;
     imageStyle: CSSProperties;
     onPointerDown: (event: PointerEvent<HTMLDivElement>) => void;
@@ -37,7 +37,7 @@ export interface UseImageHoverZoomResult {
     onPointerLeave: () => void;
 }
 
-export function useImageHoverZoom({ hoverZoom = false, pinchZoom = false }: UseImageHoverZoomOptions = {}): UseImageHoverZoomResult {
+export function useImageZoom({ hoverZoom = false, pinchZoom = false }: UseImageZoomOptions = {}): UseImageZoomResult {
     const isDesktop = useIsDesktop();
     const [imageStyle, setImageStyle] = useState<CSSProperties>(DEFAULT_ZOOM);
     const [isPinchZoomActive, setIsPinchZoomActive] = useState(false);
@@ -218,4 +218,4 @@ export function useImageHoverZoom({ hoverZoom = false, pinchZoom = false }: UseI
     };
 }
 
-export default useImageHoverZoom;
+export default useImageZoom;

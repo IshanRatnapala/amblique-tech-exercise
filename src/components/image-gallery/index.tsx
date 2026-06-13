@@ -35,7 +35,7 @@ import { cn } from '@/lib/utils';
 import type { DynamicImageDimensions } from '@/lib/images/dynamic-image';
 import type { AppConfig } from '@/types/config';
 import { UITarget } from '@/targets/ui-target';
-import { useImageHoverZoom } from '@/hooks/use-image-hover-zoom';
+import { useImageZoom } from '@/hooks/use-image-zoom';
 
 export interface GalleryImage {
     src: string;
@@ -207,7 +207,7 @@ export default function ImageGallery({
         onPointerUp,
         onPointerCancel,
         onPointerLeave,
-    } = useImageHoverZoom({
+    } = useImageZoom({
         hoverZoom: enableHoverZoom,
         pinchZoom: enablePinchZoom,
     });
