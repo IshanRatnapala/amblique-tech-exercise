@@ -69,6 +69,7 @@ export default function ProductView({ product }: ProductViewProps): ReactElement
                         images={galleryImages}
                         eager={!isProductASet && !isProductABundle}
                         enableHoverZoom
+                        enablePinchZoom
                         showNavigationArrows
                         navigationArrowSize="lg"
                         productName={product.name}

@@ -65,6 +65,8 @@ interface ImageGalleryProps {
     eager?: boolean;
     /** Enable desktop hover zoom mode for the main image */
     enableHoverZoom?: boolean;
+    /** Enable pinch zoom mode on touch devices */
+    enablePinchZoom?: boolean;
     /** Show prev/next arrows on the main image (e.g. in modal) */
     showNavigationArrows?: boolean;
     /** Size of navigation arrows: "sm" (default) or "lg" for PDP */
@@ -141,6 +143,7 @@ export default function ImageGallery({
     images,
     eager = false,
     enableHoverZoom = false,
+    enablePinchZoom = false,
     showNavigationArrows = false,
     navigationArrowSize = 'sm',
     horizontalThumbnails = false,
@@ -195,8 +198,18 @@ export default function ImageGallery({
         }
     }, []);
 
-    const { isZoomActive, imageStyle, onPointerEnter, onPointerMove, onPointerLeave } = useImageHoverZoom({
-        enabled: enableHoverZoom,
+    const {
+        isZoomActive,
+        imageStyle,
+        onPointerDown,
+        onPointerEnter,
+        onPointerMove,
+        onPointerUp,
+        onPointerCancel,
+        onPointerLeave,
+    } = useImageHoverZoom({
+        hoverZoom: enableHoverZoom,
+        pinchZoom: enablePinchZoom,
     });
 
     useEffect(() => {
@@ -250,9 +263,12 @@ export default function ImageGallery({
             <div className="space-y-4">
                 {/* Main Image */}
                 <div
-                    className="relative aspect-square overflow-hidden rounded-none bg-muted"
+                    className="relative aspect-square overflow-hidden rounded-none bg-muted touch-none lg:touch-auto"
+                    onPointerDown={onPointerDown}
                     onPointerEnter={onPointerEnter}
                     onPointerMove={onPointerMove}
+                    onPointerUp={onPointerUp}
+                    onPointerCancel={onPointerCancel}
                     onPointerLeave={onPointerLeave}>
                     <DynamicImage
                         src={selectedImage.src}
