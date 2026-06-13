@@ -36,8 +36,6 @@ function createMediaQueryHook(query: string): () => boolean {
     };
 }
 
-export const useIsDesktop = createMediaQueryHook(
-    `(min-width: ${defaultTheme.screens.lg})`
-);
+export const useIsDesktop = createMediaQueryHook(`(min-width: ${defaultTheme.screens.lg})`);
 
-export const useIsMobile = createMediaQueryHook(`(max-width: calc(${defaultTheme.screens.lg} - 1px))`);
+export const useIsMobile = createMediaQueryHook(`(max-width: calc(${defaultTheme.screens.md} - 1px))`);
