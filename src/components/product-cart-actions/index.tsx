@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { type ReactElement, Suspense, lazy, startTransition, useState, useEffect } from 'react';
+import { type ReactElement, Suspense, lazy, startTransition, useState, useEffect, useRef } from 'react';
 import type { ShopperProducts } from '@/scapi';
 import { Button } from '@/components/ui/button';
 import { useProductView } from '@/providers/product-view';
@@ -22,6 +22,7 @@ import { isProductSet, isProductBundle } from '@/lib/product/product-utils';
 import { useCheckAndExecutePendingAction } from '@/hooks/check-and-execute-pending-action';
 import { useTranslation } from 'react-i18next';
 import { UITarget } from '@/targets/ui-target';
+import ProductStickyCartActions from '@/components/product-sticky-cart-actions';
 
 /** @feature-stub Express checkout buttons — remove this import and its JSX below to strip the stub */
 const ExpressPayments = lazy(() => import('@/components/checkout/components/express-payments'));
@@ -60,6 +61,7 @@ export default function ProductCartActions({
     onBuyNow,
 }: ProductCartActionsProps): ReactElement {
     const { t } = useTranslation('product');
+    const addToCartButtonRef = useRef<HTMLButtonElement | null>(null);
     const isProductASet = isProductSet(product);
     const isProductABundle = isProductBundle(product);
 
@@ -172,6 +174,7 @@ export default function ProductCartActions({
                 {/* Standard layout: single Add to Cart / Update button */}
                 {!isCompactAddMode && !isProductASet && !isProductABundle && (
                     <Button
+                        ref={addToCartButtonRef}
                         data-testid="add-to-cart"
                         onClick={() => void onAddOrUpdateToCart()}
                         disabled={!canAddToCart || isAddingToOrUpdatingCart}
@@ -202,6 +205,16 @@ export default function ProductCartActions({
                 <UITarget targetId="sfcc.pdp.after.addToCart" />
                 {!isCompactAddMode && !isEditMode && currentProductId && <UITarget targetId="sfcc.pdp.bnpl.message" />}
             </div>
+
+            {!isCompactAddMode && !isProductASet && !isProductABundle && !isEditMode && (
+                <ProductStickyCartActions
+                    product={product}
+                    buttonLabel={isAddingToOrUpdatingCart ? t('addingToCart') : t('addToCart')}
+                    buttonDisabled={!canAddToCart || isAddingToOrUpdatingCart}
+                    addToCartButtonRef={addToCartButtonRef}
+                    onAddToCart={onAddOrUpdateToCart}
+                />
+            )}
         </div>
     );
 }
