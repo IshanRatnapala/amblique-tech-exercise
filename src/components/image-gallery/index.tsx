@@ -36,6 +36,7 @@ import type { DynamicImageDimensions } from '@/lib/images/dynamic-image';
 import type { AppConfig } from '@/types/config';
 import { UITarget } from '@/targets/ui-target';
 import { useImageZoom } from '@/hooks/use-image-zoom';
+import { usePinchZoom } from '@/hooks/use-pinch-zoom';
 
 export interface GalleryImage {
     src: string;
@@ -199,20 +200,47 @@ export default function ImageGallery({
     }, []);
 
     const {
-        isZoomActive,
-        imageStyle,
-        onPointerDown,
+        isImageZoomActive,
+        imageZoomStyle,
         onPointerEnter,
-        onPointerMove,
-        onPointerUp,
-        onPointerCancel,
+        onPointerMove: onImagePointerMove,
         onPointerLeave,
         onKeyDown,
-        resetZoom,
-    } = useImageZoom({
-        hoverZoom: enableHoverZoom,
-        pinchZoom: enablePinchZoom,
-    });
+        resetZoom: resetImageZoom,
+    } = useImageZoom({ enabled: enableHoverZoom });
+
+    const {
+        isPinchZoomActive,
+        pinchZoomStyle,
+        onPointerDown,
+        onPointerMove: onPinchPointerMove,
+        onPointerUp,
+        onPointerCancel,
+        resetPinchZoom,
+    } = usePinchZoom({ enabled: enablePinchZoom });
+
+    const onPointerMove = useCallback(
+        (event: PointerEvent<HTMLDivElement>) => {
+            if (event.pointerType === 'touch') {
+                onPinchPointerMove(event);
+                return;
+            }
+
+            // Hover zoom should only respond to non-touch pointers.
+            if (event.pointerType === 'mouse' || event.pointerType === 'pen') {
+                onImagePointerMove(event);
+            }
+        },
+        [onImagePointerMove, onPinchPointerMove]
+    );
+
+    const resetZoom = useCallback(() => {
+        resetImageZoom();
+        resetPinchZoom();
+    }, [resetImageZoom, resetPinchZoom]);
+
+    const isZoomActive = isImageZoomActive || isPinchZoomActive;
+    const imageStyle = isPinchZoomActive ? pinchZoomStyle : imageZoomStyle;
 
     useEffect(() => {
         // When images change (e.g., color variant changes), try to preserve the selected index
@@ -270,7 +298,7 @@ export default function ImageGallery({
             <div className="space-y-4">
                 {/* Main Image */}
                 <div
-                    className="relative aspect-square overflow-hidden rounded-none bg-muted touch-none lg:touch-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="relative aspect-square overflow-hidden rounded-none bg-muted touch-none lg:touch-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring touch-pinch-zoom"
                     tabIndex={0}
                     onPointerDown={onPointerDown}
                     onPointerEnter={onPointerEnter}
