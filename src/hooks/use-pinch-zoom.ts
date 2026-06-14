@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import { useCallback, useRef, useState, type CSSProperties, type PointerEvent } from 'react';
+import { useIsMobile } from '@/hooks/use-breakpoint';
 
 const DEFAULT_ZOOM: CSSProperties = {
     transform: 'translate3d(0%,0%,0) scale(1)',
@@ -35,8 +36,10 @@ interface UsePinchZoomResult {
 }
 
 export function usePinchZoom({ enabled = false }: UsePinchZoomOptions = {}): UsePinchZoomResult {
+    const isMobile = useIsMobile();
     const [pinchZoomStyle, setPinchZoomStyle] = useState<CSSProperties>(DEFAULT_ZOOM);
     const [isPinchZoomActive, setIsPinchZoomActive] = useState(false);
+    const pinchZoomEnabled = enabled && isMobile;
     const activePointersRef = useRef<Map<number, { x: number; y: number }>>(new Map());
     const pinchStartDistanceRef = useRef<number | null>(null);
     const pinchStartScaleRef = useRef(1);
@@ -72,7 +75,7 @@ export function usePinchZoom({ enabled = false }: UsePinchZoomOptions = {}): Use
 
     const updatePinchZoom = useCallback(
         (event: PointerEvent<HTMLDivElement>) => {
-            if (!enabled || pinchStartDistanceRef.current === null) {
+            if (!pinchZoomEnabled || pinchStartDistanceRef.current === null) {
                 return;
             }
 
@@ -98,7 +101,7 @@ export function usePinchZoom({ enabled = false }: UsePinchZoomOptions = {}): Use
                     : DEFAULT_ZOOM
             );
         },
-        [enabled, getTouchDistance, getTouchMidpoint]
+        [pinchZoomEnabled, getTouchDistance, getTouchMidpoint]
     );
 
     const endPointerInteraction = useCallback((event: PointerEvent<HTMLDivElement>) => {
@@ -111,7 +114,7 @@ export function usePinchZoom({ enabled = false }: UsePinchZoomOptions = {}): Use
 
     const onPointerDown = useCallback(
         (event: PointerEvent<HTMLDivElement>) => {
-            if (!enabled || event.pointerType !== 'touch') {
+            if (!pinchZoomEnabled || event.pointerType !== 'touch') {
                 return;
             }
 
@@ -124,12 +127,12 @@ export function usePinchZoom({ enabled = false }: UsePinchZoomOptions = {}): Use
                 pinchStartScaleRef.current = currentScaleRef.current;
             }
         },
-        [enabled, getTouchDistance]
+        [pinchZoomEnabled, getTouchDistance]
     );
 
     const onPointerMove = useCallback(
         (event: PointerEvent<HTMLDivElement>) => {
-            if (!enabled || event.pointerType !== 'touch') {
+            if (!pinchZoomEnabled || event.pointerType !== 'touch') {
                 return;
             }
 
@@ -139,29 +142,29 @@ export function usePinchZoom({ enabled = false }: UsePinchZoomOptions = {}): Use
                 updatePinchZoom(event);
             }
         },
-        [enabled, updatePinchZoom]
+        [pinchZoomEnabled, updatePinchZoom]
     );
 
     const onPointerUp = useCallback(
         (event: PointerEvent<HTMLDivElement>) => {
-            if (!enabled || event.pointerType !== 'touch') {
+            if (!pinchZoomEnabled || event.pointerType !== 'touch') {
                 return;
             }
 
             endPointerInteraction(event);
         },
-        [enabled, endPointerInteraction]
+        [pinchZoomEnabled, endPointerInteraction]
     );
 
     const onPointerCancel = useCallback(
         (event: PointerEvent<HTMLDivElement>) => {
-            if (!enabled || event.pointerType !== 'touch') {
+            if (!pinchZoomEnabled || event.pointerType !== 'touch') {
                 return;
             }
 
             endPointerInteraction(event);
         },
-        [enabled, endPointerInteraction]
+        [pinchZoomEnabled, endPointerInteraction]
     );
 
     const resetPinchZoom = useCallback(() => {
