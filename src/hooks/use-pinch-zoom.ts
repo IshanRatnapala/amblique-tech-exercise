@@ -93,7 +93,7 @@ export function usePinchZoom({ enabled = false }: UsePinchZoomOptions = {}): Use
                 isZooming
                     ? {
                         transform: `translate3d(0,0,0) scale(${clampedScale})`,
-                        transformOrigin: `${x * 100}% ${y * 100}%`,
+                        transformOrigin: `${(1 - x) * 100}% ${(1 - y) * 100}%`,
                     }
                     : DEFAULT_ZOOM
             );
