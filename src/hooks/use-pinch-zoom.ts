@@ -39,6 +39,8 @@ export function usePinchZoom({ enabled = false }: UsePinchZoomOptions = {}): Use
     const [isPinchZoomActive, setIsPinchZoomActive] = useState(false);
     const activePointersRef = useRef<Map<number, { x: number; y: number }>>(new Map());
     const pinchStartDistanceRef = useRef<number | null>(null);
+    const pinchStartScaleRef = useRef(1);
+    const currentScaleRef = useRef(1);
 
     const getTouchDistance = useCallback((): number => {
         const pointers = Array.from(activePointersRef.current.values());
@@ -77,16 +79,18 @@ export function usePinchZoom({ enabled = false }: UsePinchZoomOptions = {}): Use
             const distance = getTouchDistance();
             const midpoint = getTouchMidpoint();
 
-            const scaleValue = distance / pinchStartDistanceRef.current;
+            const scaleValue = pinchStartScaleRef.current * (distance / pinchStartDistanceRef.current);
             const clampedScale = Math.min(Math.max(scaleValue, 1), 3);
-            setIsPinchZoomActive(clampedScale > 1);
+            currentScaleRef.current = clampedScale;
+            const isZooming = clampedScale > 1;
+            setIsPinchZoomActive(isZooming);
 
             const rect = event.currentTarget.getBoundingClientRect();
             const x = Math.min(Math.max((midpoint.x - rect.left) / rect.width, 0), 1);
             const y = Math.min(Math.max((midpoint.y - rect.top) / rect.height, 0), 1);
 
             setPinchZoomStyle(
-                clampedScale > 1
+                isZooming
                     ? {
                         transform: `translate3d(0,0,0) scale(${clampedScale})`,
                         transformOrigin: `${x * 100}% ${y * 100}%`,
@@ -117,6 +121,7 @@ export function usePinchZoom({ enabled = false }: UsePinchZoomOptions = {}): Use
             if (activePointersRef.current.size === 2) {
                 // If there are 2 touch points, save the distance to calculate the zoom level later.
                 pinchStartDistanceRef.current = getTouchDistance();
+                pinchStartScaleRef.current = currentScaleRef.current;
             }
         },
         [enabled, getTouchDistance]
@@ -128,9 +133,9 @@ export function usePinchZoom({ enabled = false }: UsePinchZoomOptions = {}): Use
                 return;
             }
 
-            event.preventDefault();
             activePointersRef.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
             if (activePointersRef.current.size === 2) {
+                event.preventDefault();
                 updatePinchZoom(event);
             }
         },
@@ -144,10 +149,6 @@ export function usePinchZoom({ enabled = false }: UsePinchZoomOptions = {}): Use
             }
 
             endPointerInteraction(event);
-            if (activePointersRef.current.size < 2) {
-                setIsPinchZoomActive(false);
-                setPinchZoomStyle(DEFAULT_ZOOM);
-            }
         },
         [enabled, endPointerInteraction]
     );
@@ -159,10 +160,6 @@ export function usePinchZoom({ enabled = false }: UsePinchZoomOptions = {}): Use
             }
 
             endPointerInteraction(event);
-            if (activePointersRef.current.size < 2) {
-                setIsPinchZoomActive(false);
-                setPinchZoomStyle(DEFAULT_ZOOM);
-            }
         },
         [enabled, endPointerInteraction]
     );
@@ -170,6 +167,8 @@ export function usePinchZoom({ enabled = false }: UsePinchZoomOptions = {}): Use
     const resetPinchZoom = useCallback(() => {
         activePointersRef.current.clear();
         pinchStartDistanceRef.current = null;
+        pinchStartScaleRef.current = 1;
+        currentScaleRef.current = 1;
         setIsPinchZoomActive(false);
         setPinchZoomStyle(DEFAULT_ZOOM);
     }, []);

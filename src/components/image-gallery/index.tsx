@@ -239,6 +239,10 @@ export default function ImageGallery({
         resetPinchZoom();
     }, [resetImageZoom, resetPinchZoom]);
 
+    const handlePinchZoomOverlayPointerDown = useCallback(() => {
+        resetPinchZoom();
+    }, [resetPinchZoom]);
+
     const isZoomActive = isImageZoomActive || isPinchZoomActive;
     const imageStyle = isPinchZoomActive ? pinchZoomStyle : imageZoomStyle;
 
@@ -296,9 +300,21 @@ export default function ImageGallery({
     return (
         <UITarget targetId="sfcc.pdp.products.gallery">
             <div className="space-y-4">
+                {/* Pinch Zoom Overlay */}
+                {isPinchZoomActive && (
+                    <div
+                        className="fixed inset-0 z-50"
+                        aria-hidden="true"
+                        onPointerDown={handlePinchZoomOverlayPointerDown}
+                    />
+                )}
+
                 {/* Main Image */}
                 <div
-                    className="relative aspect-square overflow-hidden rounded-none bg-muted touch-none lg:touch-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring touch-pinch-zoom"
+                    className={cn(
+                        'relative aspect-square overflow-hidden rounded-none bg-muted touch-pan-y lg:touch-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                        isPinchZoomActive && 'z-51'
+                    )}
                     tabIndex={0}
                     onPointerDown={onPointerDown}
                     onPointerEnter={onPointerEnter}
