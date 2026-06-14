@@ -22,6 +22,7 @@ import { ProductImage } from './product-image';
 import ImageNavArrows from '@/components/image-nav-arrows';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
+import { useSwipe } from '@/hooks/use-swipe';
 
 const HOVER_THROTTLE_INTERVAL_MS = 1000;
 
@@ -49,6 +50,11 @@ const ProductImageContainer = ({
     const [isBrowser, setIsBrowser] = useState(false);
     const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
     const hoverPositionRef = useRef<'left' | 'right' | null>(null);
+
+    const swipe = useSwipe({
+        onSwipeLeft: () => cycleToNextImage(),
+        onSwipeRight: () => cycleToPreviousImage(),
+    });
 
     // Get all images for the selected color variant
     const allImages = useMemo(
@@ -126,13 +132,16 @@ const ProductImageContainer = ({
 
     return (
         <div
-            className={`${showNavigationArrows ? 'group/image ' : ''}relative overflow-hidden bg-secondary/20 flex flex-col ${
+            className={`${showNavigationArrows ? 'group/image ' : ''}relative overflow-hidden bg-secondary/20 flex flex-col touch-pan-y ${
                 imgAspectRatio === 1 ? 'aspect-square' : ''
             } ${className || ''}`}
             style={heightStyle}
             onPointerEnter={throttledHandlePointerEnter}
             onPointerLeave={handlePointerLeave}
-            onPointerMove={handlePointerMove}>
+            onPointerMove={handlePointerMove}
+            onPointerDown={swipe.onPointerDown}
+            onPointerUp={swipe.onPointerUp}
+            onPointerCancel={swipe.onPointerCancel}>
             {/* Product Image */}
             <Link
                 to={createProductUrl(product.productId, selectedColorValue)}
