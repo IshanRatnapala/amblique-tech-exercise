@@ -95,9 +95,9 @@ export function usePinchZoom({ enabled = false }: UsePinchZoomOptions = {}): Use
             setPinchZoomStyle(
                 isZooming
                     ? {
-                        transform: `translate3d(0,0,0) scale(${clampedScale})`,
-                        transformOrigin: `${(1 - x) * 100}% ${(1 - y) * 100}%`,
-                    }
+                          transform: `translate3d(0,0,0) scale(${clampedScale})`,
+                          transformOrigin: `${(1 - x) * 100}% ${(1 - y) * 100}%`,
+                      }
                     : DEFAULT_ZOOM
             );
         },
