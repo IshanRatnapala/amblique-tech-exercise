@@ -428,15 +428,6 @@ const ProductTile = forwardRef<HTMLDivElement, ProductTileProps>(
                         />
                         <UITarget targetId="sfcc.plp.shipping.deliveryEstimate" />
 
-                        {/* Clickable product link overlay */}
-                        <Link
-                            to={productUrl}
-                            className="absolute inset-0 z-[1] cursor-pointer"
-                            aria-label={`View ${productName}`}
-                            onClick={handleClick}
-                            tabIndex={-1}
-                        />
-
                         {/* Badges — top-left */}
                         {productData?.badges.hasBadges && (
                             <div className="absolute top-2 left-2 flex flex-col items-start gap-1 z-20">
