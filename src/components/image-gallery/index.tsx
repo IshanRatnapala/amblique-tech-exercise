@@ -303,7 +303,7 @@ export default function ImageGallery({
                 {/* Pinch Zoom Overlay */}
                 {isPinchZoomActive && (
                     <div
-                        className="fixed inset-0 z-50"
+                        className="fixed inset-0 z-49"
                         aria-hidden="true"
                         onPointerDown={handlePinchZoomOverlayPointerDown}
                     />
@@ -313,7 +313,7 @@ export default function ImageGallery({
                 <div
                     className={cn(
                         'relative aspect-square overflow-hidden rounded-none bg-muted touch-pan-y lg:touch-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                        isPinchZoomActive && 'z-51'
+                        isPinchZoomActive && 'z-40'
                     )}
                     tabIndex={0}
                     onPointerDown={onPointerDown}
