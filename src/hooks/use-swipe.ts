@@ -37,11 +37,10 @@ export function useSwipe({ threshold = 50, onSwipeLeft, onSwipeRight }: UseSwipe
     }, []);
 
     const onPointerDown = useCallback((event: PointerEvent<HTMLElement>) => {
-        event.preventDefault();
-
         if (event.pointerType !== 'touch') {
             return;
         }
+        event.preventDefault();
 
         startXRef.current = event.clientX;
         pointerIdRef.current = event.pointerId;
@@ -51,7 +50,6 @@ export function useSwipe({ threshold = 50, onSwipeLeft, onSwipeRight }: UseSwipe
 
     const onPointerUp = useCallback(
         (event: PointerEvent<HTMLElement>) => {
-            event.preventDefault();
             if (
                 event.pointerType !== 'touch' ||
                 startXRef.current == null ||
@@ -59,6 +57,7 @@ export function useSwipe({ threshold = 50, onSwipeLeft, onSwipeRight }: UseSwipe
             ) {
                 return;
             }
+            event.preventDefault();
 
             const deltaX = event.clientX - startXRef.current;
 
