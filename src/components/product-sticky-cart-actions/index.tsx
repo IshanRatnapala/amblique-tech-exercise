@@ -23,7 +23,6 @@ import type { ShopperProducts } from '@/scapi';
 import { getDisplayVariationValues } from '@/lib/product/product-utils';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
-import { useCurrentVariant } from '@/hooks/product/use-current-variant';
 
 interface ProductStickyCartActionsProps {
     product: ShopperProducts.schemas['Product'];
@@ -44,7 +43,6 @@ export default function ProductStickyCartActions({
     const isMobile = useIsMobile();
     const [isMainAddToCartVisible, setIsMainAddToCartVisible] = useState(true);
 
-    const currentVariant = useCurrentVariant({ product });
     const selectedAttributes = useSelectedVariations({ product });
     const displayVariationValues = getDisplayVariationValues(product.variationAttributes, selectedAttributes);
 
@@ -97,7 +95,7 @@ export default function ProductStickyCartActions({
                 <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold leading-5 text-foreground">{product.name}</p>
                     <p className="truncate text-xs leading-4 text-muted-foreground">
-                        {(currentVariant && variantSummary) || t('selectAllOptions')}
+                        {variantSummary || t('selectAllOptions')}
                     </p>
                 </div>
                 <Button onClick={onAddToCart} disabled={buttonDisabled} className="h-10 px-4 text-sm" size="sm">

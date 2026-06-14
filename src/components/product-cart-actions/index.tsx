@@ -209,7 +209,13 @@ export default function ProductCartActions({
             {!isCompactAddMode && !isProductASet && !isProductABundle && !isEditMode && (
                 <ProductStickyCartActions
                     product={product}
-                    buttonLabel={isAddingToOrUpdatingCart ? t('addingToCart') : t('addToCart')}
+                    buttonLabel={
+                        !currentVariant
+                            ? t('selectOptions')
+                            : isAddingToOrUpdatingCart
+                              ? t('addingToCart')
+                              : t('addToCart')
+                    }
                     buttonDisabled={!canAddToCart || isAddingToOrUpdatingCart}
                     addToCartButtonRef={addToCartButtonRef}
                     onAddToCart={onAddOrUpdateToCart}
