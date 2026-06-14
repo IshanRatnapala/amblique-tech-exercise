@@ -120,6 +120,16 @@ const ProductImageContainer = ({
         }
     }, [hoverTimerRef]);
 
+    // Clear hover timer on unmount
+    useEffect(() => {
+        return () => {
+            if (hoverTimerRef.current) {
+                clearInterval(hoverTimerRef.current);
+            }
+        };
+    }, []);
+
+    //  Set a flag to indicate we're in a browser environment.
     useEffect(() => {
         setIsBrowser(true);
     }, []);
