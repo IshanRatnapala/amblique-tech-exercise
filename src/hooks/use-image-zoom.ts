@@ -41,6 +41,12 @@ interface UseImageZoomResult {
     resetZoom: () => void;
 }
 
+/**
+ * Provides desktop hover zoom and keyboard zoom interactions for product imagery.
+ *
+ * @param options Zoom configuration.
+ * @returns Zoom state, computed styles, and event handlers.
+ */
 export function useImageZoom({ enabled = false }: UseImageZoomOptions = {}): UseImageZoomResult {
     const isDesktop = useIsDesktop();
     const [imageZoomStyle, setImageZoomStyle] = useState<CSSProperties>(DEFAULT_ZOOM);

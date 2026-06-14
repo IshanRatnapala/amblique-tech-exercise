@@ -35,6 +35,12 @@ interface UsePinchZoomResult {
     resetPinchZoom: () => void;
 }
 
+/**
+ * Tracks two-finger touch input and computes pinch-based zoom state/styles.
+ *
+ * @param options Pinch zoom configuration.
+ * @returns Pinch zoom state, computed style, and pointer handlers.
+ */
 export function usePinchZoom({ enabled = false }: UsePinchZoomOptions = {}): UsePinchZoomResult {
     const isMobile = useIsMobile();
     const [pinchZoomStyle, setPinchZoomStyle] = useState<CSSProperties>(DEFAULT_ZOOM);

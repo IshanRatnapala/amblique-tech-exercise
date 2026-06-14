@@ -16,8 +16,11 @@
 import { useCallback, useRef, type PointerEvent } from 'react';
 
 interface UseSwipeOptions {
+    /** Minimum horizontal movement in pixels required to trigger a swipe callback. */
     threshold?: number;
+    /** Called when a touch swipe meets the threshold and moves left. */
     onSwipeLeft?: () => void;
+    /** Called when a touch swipe meets the threshold and moves right. */
     onSwipeRight?: () => void;
 }
 
@@ -27,6 +30,12 @@ interface UseSwipeResult {
     onPointerCancel: () => void;
 }
 
+/**
+ * Detects left and right touch swipe gestures from pointer events.
+ *
+ * @param options Swipe detection options and callbacks.
+ * @returns Pointer event handlers for swipe tracking.
+ */
 export function useSwipe({ threshold = 50, onSwipeLeft, onSwipeRight }: UseSwipeOptions): UseSwipeResult {
     const startXRef = useRef<number | null>(null);
     const pointerIdRef = useRef<number | null>(null);

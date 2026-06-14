@@ -16,6 +16,13 @@
 import { useSyncExternalStore } from 'react';
 import defaultTheme from 'tailwindcss/defaultTheme';
 
+/**
+ * Creates a hook that subscribes to a media query and returns whether it currently matches.
+ * Uses `useSyncExternalStore` for SSR safe subscriptions.
+ *
+ * @param query Media query string to evaluate.
+ * @returns Hook that returns `true` when the media query matches, `false` when called on the server.
+ */
 function createMediaQueryHook(query: string): () => boolean {
     function subscribe(callback: () => void) {
         const mql = globalThis.matchMedia?.(query);
@@ -36,6 +43,16 @@ function createMediaQueryHook(query: string): () => boolean {
     };
 }
 
+/**
+ * Indicates whether the viewport is at least the Tailwind `lg` breakpoint.
+ *
+ * @returns `true` when the viewport width matches desktop sizes.
+ */
 export const useIsDesktop = createMediaQueryHook(`(min-width: ${defaultTheme.screens.lg})`);
 
+/**
+ * Indicates whether the viewport is below the Tailwind `md` breakpoint.
+ *
+ * @returns `true` when the viewport width matches mobile sizes.
+ */
 export const useIsMobile = createMediaQueryHook(`(max-width: calc(${defaultTheme.screens.md} - 1px))`);
